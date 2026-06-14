@@ -61,6 +61,8 @@ def _sanitize_markdown_response(text: str) -> str:
         if heading_match:
             heading_level = heading_match.group(1)
             heading_text = _strip_inline_markdown(heading_match.group(2))
+            if heading_text.lower() in {"краткая выжимка", "резюме"}:
+                continue
             lines.append(f"{heading_level} {heading_text}" if heading_text else heading_level)
             continue
 
@@ -332,12 +334,16 @@ def compose_final_answer(original_request: str, info_result: Dict) -> str:
         f"Original request: {original_request}\n"
         f"Structured research data: {info_text}\n"
         f"Search context: {search_context or 'None'}\n\n"
-        "Write a polished final answer in Russian using markdown.\n"
+        "Write a polished full answer in Russian using markdown.\n"
         "The answer must be in Russian.\n"
+        "Do not repeat the short summary from the previous step.\n"
+        "Do not include a separate 'Краткая выжимка' or 'Резюме' section.\n"
+        "Start directly with the deeper analysis and conclusions.\n"
         "Use only simple markdown that we render safely: section headings and plain bullet lists.\n"
         "Do not use bold, italics, tables, code blocks, blockquotes, links, or any other markdown elements.\n"
         "Use these sections when relevant:\n"
-        "## Краткая выжимка\n"
+        "## Основные выводы\n"
+        "## Подробный анализ\n"
         "## Ключевые тезисы\n"
         "## Рекомендации\n"
         "## Источники\n\n"
